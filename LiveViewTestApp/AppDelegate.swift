@@ -49,7 +49,7 @@ class Listener: PlaygroundRemoteLiveViewProxyDelegate {
 @UIApplicationMain
 class AppDelegate: LiveViewHost.AppDelegate {
     
-    let camera = CameraCapture()
+//    let camera = CameraCapture()
     
     override func setUpLiveView() -> PlaygroundLiveViewable {
         // This method should return a fully-configured live view. This method must be implemented.
@@ -59,14 +59,14 @@ class AppDelegate: LiveViewHost.AppDelegate {
         // changing the implementation of the `liveViewConfiguration` property below.
         let a = Book_Sources.sharedLiveViewController
 
-        camera.setup()
-        
-        camera.vc = a
-        
-        DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 2, execute: {
-            self.camera.session.startRunning()
-        })
-        
+//        camera.setup()
+//        
+//        camera.vc = a
+//        
+//        DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 2, execute: {
+//            self.camera.session.startRunning()
+//        })
+//        
         return a
     }
 

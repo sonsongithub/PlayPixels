@@ -1,36 +1,51 @@
+//#-hidden-code
 import UIKit
 import PlaygroundSupport
 
-let camera = CameraCapture()
+let page = PlaygroundPage.current
+page.needsIndefiniteExecution = true
 
-camera.setup()
-
-let proc:(inout [CUnsignedChar], Int, Int, Int) -> Void = { pixel, width, height, bytesPerRow in
+//#-end-hidden-code
+func process(input: UnsafePointer<CUnsignedChar>, output: inout [CUnsignedChar], width: Int, height: Int, bytesPerPixel: Int) {
+    //#-editable-code
     for y in 0..<height {
-        for x in 0..<width/2 {
-            pixel[3 * x + y * bytesPerRow + 2] = 255
+        for x in 0..<width {
+            let red = input[3 * x + y * width * bytesPerPixel + 0]
+            let green = input[3 * x + y * width * bytesPerPixel + 1]
+            let blue = input[3 * x + y * width * bytesPerPixel + 2]
+            
+            output[bytesPerPixel * x + y * width * bytesPerPixel + 0] = red
+            output[bytesPerPixel * x + y * width * bytesPerPixel + 1] = green
+            output[bytesPerPixel * x + y * width * bytesPerPixel + 2] = blue
         }
     }
+    //#-end-editable-code
 }
 
-//camera.imageFunc = proc
-
-let page = PlaygroundPage.current
-PlaygroundPage.current.needsIndefiniteExecution = true
-if let proxy = page.liveView as? PlaygroundRemoteLiveViewProxy {
-    camera.vc = proxy
-    let a = 10
-    proxy.send(.integer(a))
-}
-
+//#-hidden-code
 class Listener: PlaygroundRemoteLiveViewProxyDelegate {
+    
+    var pixelBuffer24bit: [CUnsignedChar]?
+    
     func remoteLiveViewProxy(_ remoteLiveViewProxy: PlaygroundRemoteLiveViewProxy,
                              received message: PlaygroundValue) {
-        switch message {
-        case .integer(let a):
-            print(a)
-        default:
-            do {}
+        if let (data, width, height) = unpack(message) {
+            print(data)
+            if pixelBuffer24bit == nil {
+                pixelBuffer24bit = [CUnsignedChar](repeating: 0, count: height * width * 3)
+            }
+            
+            data.withUnsafeBytes { (rawPtr: UnsafePointer<CUnsignedChar>) in
+
+                process(input: rawPtr, output: &pixelBuffer24bit!, width: width, height: height, bytesPerPixel: 3)
+
+                let data = NSData(bytes: pixelBuffer24bit, length: MemoryLayout<CUnsignedChar>.size * width * height * 3)
+                
+                guard let proxy = PlaygroundPage.current.liveView as? PlaygroundRemoteLiveViewProxy else { return }
+                
+                proxy.send(.data(data as Data))
+            }
+            
         }
     }
     func remoteLiveViewProxyConnectionClosed(_ remoteLiveViewProxy: PlaygroundRemoteLiveViewProxy) { }
@@ -42,7 +57,4 @@ if let proxy = page.liveView as? PlaygroundRemoteLiveViewProxy {
     proxy.delegate = listener
 }
 
-DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 2, execute: {
-    camera.session.startRunning()
-})
-
+//#-end-hidden-code
