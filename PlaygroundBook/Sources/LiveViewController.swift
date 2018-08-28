@@ -166,6 +166,7 @@ public class CameraCapture: NSObject, AVCaptureVideoDataOutputSampleBufferDelega
     }
     
     
+    
     private func creatCGImage(pointer: UnsafeMutableRawPointer?, width: Int, height: Int, bytesPerPixel: Int) -> CGImage? {
         let colorSpace = CGColorSpaceCreateDeviceRGB()
         let bitmapInfo = CGBitmapInfo(rawValue: CGImageAlphaInfo.premultipliedLast.rawValue)
@@ -178,6 +179,7 @@ public class CameraCapture: NSObject, AVCaptureVideoDataOutputSampleBufferDelega
 
 @objc(Book_Sources_LiveViewController)
 public class LiveViewController: UIViewController, PlaygroundLiveViewMessageHandler, PlaygroundLiveViewSafeAreaContainer, UITableViewDelegate, UITableViewDataSource {
+    
     
     @IBOutlet var label: UILabel!
     
@@ -332,6 +334,8 @@ public class LiveViewController: UIViewController, PlaygroundLiveViewMessageHand
             }
         }
         
+        send(PlaygroundValue.integer(10))
+        
         data.withUnsafeBytes { (u8Ptr: UnsafePointer<CUnsignedChar>) in
             let rawPtr = UnsafePointer(u8Ptr)
             
@@ -386,6 +390,7 @@ public class LiveViewController: UIViewController, PlaygroundLiveViewMessageHand
         self.view.bringSubview(toFront: label)
         buffers.append("viewWillTransition")
         tableView.reloadData()
+        
     }
     
     public func receive(_ message: PlaygroundValue) {

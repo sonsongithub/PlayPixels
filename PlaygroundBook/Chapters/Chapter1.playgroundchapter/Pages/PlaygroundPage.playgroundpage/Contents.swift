@@ -23,6 +23,25 @@ if let proxy = page.liveView as? PlaygroundRemoteLiveViewProxy {
     proxy.send(.integer(a))
 }
 
+class Listener: PlaygroundRemoteLiveViewProxyDelegate {
+    func remoteLiveViewProxy(_ remoteLiveViewProxy: PlaygroundRemoteLiveViewProxy,
+                             received message: PlaygroundValue) {
+        switch message {
+        case .integer(let a):
+            print(a)
+        default:
+            do {}
+        }
+    }
+    func remoteLiveViewProxyConnectionClosed(_ remoteLiveViewProxy: PlaygroundRemoteLiveViewProxy) { }
+}
+
+let listener = Listener()
+
+if let proxy = page.liveView as? PlaygroundRemoteLiveViewProxy {
+    proxy.delegate = listener
+}
+
 DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 2, execute: {
     camera.session.startRunning()
 })

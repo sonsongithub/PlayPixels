@@ -10,6 +10,42 @@ import LiveViewHost
 import PlaygroundSupport
 import Book_Sources
 
+
+// Handle messages from the live view.
+class Listener: PlaygroundRemoteLiveViewProxyDelegate {
+    func remoteLiveViewProxy(_ remoteLiveViewProxy: PlaygroundRemoteLiveViewProxy,
+                             received message: PlaygroundValue) {
+//
+//        guard let liveViewMessage = PlaygroundMessageFromLiveView(playgroundValue: message) else { return }
+//
+//        switch liveViewMessage {
+//        case .planeFound(let plane):
+//            planes.append(plane)
+//            detectedPlane(plane: plane)
+//
+//            DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 2, execute: {
+//                if placedObjectsCount == 0 {
+//                    page.assessmentStatus = assessmentPoint(planes: planes)
+//                }
+//            })
+//        case .objectPlacedOnPlane(let object, let plane, let position):
+//            if let index = planes.index(of: plane) {
+//                object.position = position
+//                planes[index].placedObjects.append(object)
+//
+//                proxy?.send(
+//                    PlaygroundMessageToLiveView.announceObjectPlacement(objects: planes[index].placedObjects).playgroundValue
+//                )
+//            }
+//
+//            page.assessmentStatus = assessmentPoint(planes: planes)
+//        default:
+//            break
+//        }
+    }
+    func remoteLiveViewProxyConnectionClosed(_ remoteLiveViewProxy: PlaygroundRemoteLiveViewProxy) { }
+}
+
 @UIApplicationMain
 class AppDelegate: LiveViewHost.AppDelegate {
     
@@ -22,12 +58,7 @@ class AppDelegate: LiveViewHost.AppDelegate {
         // as if it were a live view in Swift Playgrounds. You can control how the live view is shown by
         // changing the implementation of the `liveViewConfiguration` property below.
         let a = Book_Sources.sharedLiveViewController
-        
-        switch a {
-        default:
-            print(a)
-        }
-        
+
         camera.setup()
         
         camera.vc = a
