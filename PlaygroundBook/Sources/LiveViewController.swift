@@ -94,8 +94,9 @@ public class LiveViewController: UIViewController, PlaygroundLiveViewMessageHand
     var constraintHeight: NSLayoutConstraint?
     let imageView = UIImageView(frame: .zero)
     
-    
     public func captureOutput(_ output: AVCaptureOutput, didOutput sampleBuffer: CMSampleBuffer, from connection: AVCaptureConnection) {
+        
+        
         let pixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer)!
         CVPixelBufferLockBaseAddress(pixelBuffer, .readOnly)
         
@@ -154,9 +155,7 @@ public class LiveViewController: UIViewController, PlaygroundLiveViewMessageHand
         updateOrientation(width: width, height: height)
         
         let data = NSData(bytes: pixelBuffer24bit, length: MemoryLayout<CUnsignedChar>.size * outputWidth * outputHeight * 3)
- 
         let value = PlaygroundValue.dictionary(["data": .data(data as Data), "width": .integer(outputWidth), "height": .integer(outputHeight), "bytesPerPixel": .integer(3)])
-        
 #if LiveViewTestApp
         self.update(value)
 #else
@@ -313,11 +312,15 @@ public class LiveViewController: UIViewController, PlaygroundLiveViewMessageHand
     }
         
     public func update(_ value: PlaygroundValue) {
-        guard let (data, _, _, bytesPerPixel) = unpack(value) else { return }
+        guard let (data, _, _, bytesPerPixel) = unpack(value) else {
+            return
+        }
         
         if bytesPerPixel == 3 {
             
-            guard outputHeight > 0 && outputWidth > 0 else { return }
+            guard outputHeight > 0 && outputWidth > 0 else {
+                return
+            }
             
             data.withUnsafeBytes { (u8Ptr: UnsafePointer<CUnsignedChar>) in
                 let rawPtr = UnsafePointer(u8Ptr)
@@ -333,7 +336,9 @@ public class LiveViewController: UIViewController, PlaygroundLiveViewMessageHand
                     }
                 }
                 
-                guard let cgImage = creatCGImage(pointer: &pixelBuffer32bit!, width: outputWidth, height: outputHeight, bytesPerPixel: outputWidth * 4) else { return }
+                guard let cgImage = creatCGImage(pointer: &pixelBuffer32bit!, width: outputWidth, height: outputHeight, bytesPerPixel: outputWidth * 4) else {
+                    return
+                }
                 
                 let uiImage = UIImage(cgImage: cgImage)
                 
@@ -343,7 +348,9 @@ public class LiveViewController: UIViewController, PlaygroundLiveViewMessageHand
             }
         } else if bytesPerPixel == 1 {
             
-            guard outputHeight > 0 && outputWidth > 0 else { return }
+            guard outputHeight > 0 && outputWidth > 0 else {
+                return
+            }
             
             data.withUnsafeBytes { (u8Ptr: UnsafePointer<CUnsignedChar>) in
                 let rawPtr = UnsafePointer(u8Ptr)
@@ -366,26 +373,7 @@ public class LiveViewController: UIViewController, PlaygroundLiveViewMessageHand
                 }
             }
         }
-        
     }
-    
-//    public func updateAttribute(_ dict: [String : PlaygroundValue]) {
-//
-//        guard let value_w = dict["width"] else { return }
-//        guard let value_h = dict["height"] else { return }
-//
-//        switch (value_w, value_h) {
-//        case (.integer(let w), .integer(let h)):
-//            print(w)
-//            print(h)
-//            updateOrientation(width: w, height: h)
-//            if pixelBuffer32bit == nil {
-//                pixelBuffer32bit = [CUnsignedChar](repeating: 0, count: w * h * 4)
-//            }
-//        default:
-//            do {}
-//        }
-//    }
     
     public override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
         self.view.bringSubview(toFront: label)
@@ -394,16 +382,6 @@ public class LiveViewController: UIViewController, PlaygroundLiveViewMessageHand
     }
     
     public func receive(_ message: PlaygroundValue) {
-        
         update(message)
-        
-//        switch message {
-//        case .dictionary(let dict):
-//            updateAttribute(dict)
-//        case .data(let data):
-//            self.updateImage(data)
-//        default:
-//            do {}
-//        }
     }
 }

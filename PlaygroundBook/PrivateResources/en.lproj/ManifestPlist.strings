@@ -16,3 +16,6 @@ Contains English localizations of values in Manifest.plist files in the playgrou
 
 /* The localized name of the first page in the first chapter in the playground book. */
 "Binarize" = "二値化";
+
+/* The localized name of the first page in the first chapter in the playground book. */
+"Filter" = "畳み込み";
