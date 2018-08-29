@@ -19,18 +19,19 @@ public enum CameraOrientation {
     case unknown
 }
 
-public func unpack(_ value: PlaygroundValue) -> (Data, Int, Int)? {
+public func unpack(_ value: PlaygroundValue) -> (Data, Int, Int, Int)? {
     
     if case .dictionary(let dict) = value {
         guard let d_value = dict["data"] else { return nil }
         guard let w_value = dict["width"] else { return nil }
         guard let h_value = dict["height"] else { return nil }
+        guard let p_value = dict["bytesPerPixel"] else { return nil }
         
-        if case (.data(let data), .integer(let width), .integer(let height)) = (d_value, w_value, h_value) {
+        if case (.data(let data), .integer(let width), .integer(let height), .integer(let bytesPerPixel)) = (d_value, w_value, h_value, p_value) {
             print(data)
             print(width)
             print(height)
-            return (data, width, height)
+            return (data, width, height, bytesPerPixel)
         }
     }
     
@@ -113,9 +114,9 @@ public class LiveViewController: UIViewController, PlaygroundLiveViewMessageHand
             ]
             print(dict)
             #if LiveViewTestApp
-            vc?.updateAttribute(dict)
+//            vc?.updateAttribute(dict)
             #else
-            vc?.send(.dictionary(dict))
+//            vc?.send(.dictionary(dict))
             #endif
             pixelBuffer24bit = [CUnsignedChar](repeating: 0, count: height * width * 3)
         }
@@ -153,32 +154,15 @@ public class LiveViewController: UIViewController, PlaygroundLiveViewMessageHand
         updateOrientation(width: width, height: height)
         
         let data = NSData(bytes: pixelBuffer24bit, length: MemoryLayout<CUnsignedChar>.size * outputWidth * outputHeight * 3)
-        
-//        imageFunc(&pixelBuffer24bit!, outputWidth, outputHeight, 3 * outputWidth)
-        
-//        let value = PlaygroundValue.dictionary(["data": .data(data as Data), "width": .integer(outputWidth), "height": .integer(outputHeight)])
-//        if let a = unpack(value) {
-//            print(a)
-//        }
+ 
+        let value = PlaygroundValue.dictionary(["data": .data(data as Data), "width": .integer(outputWidth), "height": .integer(outputHeight), "bytesPerPixel": .integer(3)])
         
 #if LiveViewTestApp
-        self.updateImage(data as Data)
+        self.update(value)
 #else
-        let value = PlaygroundValue.dictionary(["data": .data(data as Data), "width": .integer(outputWidth), "height": .integer(outputHeight)])
         self.send(value)
 #endif
-        
-        
-        
         CVPixelBufferUnlockBaseAddress(pixelBuffer, .readOnly)
-        
-//        let data = NSData(bytes: pixelBuffer24bit, length: MemoryLayout<CUnsignedChar>.size * outputWidth * outputHeight * 3)
-        
-//        #if LiveViewTestApp
-//        vc?.updateImage(data as Data)
-//        #else
-//        vc?.send(.data(data as Data))
-//        #endif
     }
     
     public func setup() {
@@ -327,68 +311,99 @@ public class LiveViewController: UIViewController, PlaygroundLiveViewMessageHand
         guard let context = CGContext(data: pointer, width: (width), height: (height), bitsPerComponent: 8, bytesPerRow: (bytesPerPixel), space: colorSpace, bitmapInfo: bitmapInfo.rawValue) else { return nil }
         return context.makeImage()
     }
-    
-    public func updateImage(_ data: Data) {
         
-        guard outputHeight > 0 && outputWidth > 0 else { return }
+    public func update(_ value: PlaygroundValue) {
+        guard let (data, _, _, bytesPerPixel) = unpack(value) else { return }
         
-        data.withUnsafeBytes { (u8Ptr: UnsafePointer<CUnsignedChar>) in
-            let rawPtr = UnsafePointer(u8Ptr)
-            for y in 0..<outputHeight {
-                for x in 0..<outputWidth {
-                    let r = rawPtr[3 * x + y * outputWidth * 3 + 0]
-                    let g = rawPtr[3 * x + y * outputWidth * 3 + 1]
-                    let b = rawPtr[3 * x + y * outputWidth * 3 + 2]
-                    pixelBuffer32bit![4 * x + y * outputWidth * 4 + 0] = 255
-                    pixelBuffer32bit![4 * x + y * outputWidth * 4 + 1] = b
-                    pixelBuffer32bit![4 * x + y * outputWidth * 4 + 2] = g
-                    pixelBuffer32bit![4 * x + y * outputWidth * 4 + 3] = r
+        if bytesPerPixel == 3 {
+            
+            guard outputHeight > 0 && outputWidth > 0 else { return }
+            
+            data.withUnsafeBytes { (u8Ptr: UnsafePointer<CUnsignedChar>) in
+                let rawPtr = UnsafePointer(u8Ptr)
+                for y in 0..<outputHeight {
+                    for x in 0..<outputWidth {
+                        let r = rawPtr[3 * x + y * outputWidth * 3 + 0]
+                        let g = rawPtr[3 * x + y * outputWidth * 3 + 1]
+                        let b = rawPtr[3 * x + y * outputWidth * 3 + 2]
+                        pixelBuffer32bit![4 * x + y * outputWidth * 4 + 0] = 255
+                        pixelBuffer32bit![4 * x + y * outputWidth * 4 + 1] = b
+                        pixelBuffer32bit![4 * x + y * outputWidth * 4 + 2] = g
+                        pixelBuffer32bit![4 * x + y * outputWidth * 4 + 3] = r
+                    }
+                }
+                
+                guard let cgImage = creatCGImage(pointer: &pixelBuffer32bit!, width: outputWidth, height: outputHeight, bytesPerPixel: outputWidth * 4) else { return }
+                
+                let uiImage = UIImage(cgImage: cgImage)
+                
+                DispatchQueue.main.async {
+                    self.imageView.image = uiImage
                 }
             }
+        } else if bytesPerPixel == 1 {
             
-            guard let cgImage = creatCGImage(pointer: &pixelBuffer32bit!, width: outputWidth, height: outputHeight, bytesPerPixel: outputWidth * 4) else { return }
+            guard outputHeight > 0 && outputWidth > 0 else { return }
             
-            let uiImage = UIImage(cgImage: cgImage)
-            
-            DispatchQueue.main.async {
-                self.imageView.image = uiImage
+            data.withUnsafeBytes { (u8Ptr: UnsafePointer<CUnsignedChar>) in
+                let rawPtr = UnsafePointer(u8Ptr)
+                for y in 0..<outputHeight {
+                    for x in 0..<outputWidth {
+                        let gray = rawPtr[x + y * outputWidth]
+                        pixelBuffer32bit![4 * x + y * outputWidth * 4 + 0] = 255
+                        pixelBuffer32bit![4 * x + y * outputWidth * 4 + 1] = gray
+                        pixelBuffer32bit![4 * x + y * outputWidth * 4 + 2] = gray
+                        pixelBuffer32bit![4 * x + y * outputWidth * 4 + 3] = gray
+                    }
+                }
+                
+                guard let cgImage = creatCGImage(pointer: &pixelBuffer32bit!, width: outputWidth, height: outputHeight, bytesPerPixel: outputWidth * 4) else { return }
+                
+                let uiImage = UIImage(cgImage: cgImage)
+                
+                DispatchQueue.main.async {
+                    self.imageView.image = uiImage
+                }
             }
         }
+        
     }
     
-    public func updateAttribute(_ dict: [String : PlaygroundValue]) {
-        
-        guard let value_w = dict["width"] else { return }
-        guard let value_h = dict["height"] else { return }
-        
-        switch (value_w, value_h) {
-        case (.integer(let w), .integer(let h)):
-            print(w)
-            print(h)
-            updateOrientation(width: w, height: h)
-            if pixelBuffer32bit == nil {
-                pixelBuffer32bit = [CUnsignedChar](repeating: 0, count: w * h * 4)
-            }
-        default:
-            do {}
-        }
-    }
+//    public func updateAttribute(_ dict: [String : PlaygroundValue]) {
+//
+//        guard let value_w = dict["width"] else { return }
+//        guard let value_h = dict["height"] else { return }
+//
+//        switch (value_w, value_h) {
+//        case (.integer(let w), .integer(let h)):
+//            print(w)
+//            print(h)
+//            updateOrientation(width: w, height: h)
+//            if pixelBuffer32bit == nil {
+//                pixelBuffer32bit = [CUnsignedChar](repeating: 0, count: w * h * 4)
+//            }
+//        default:
+//            do {}
+//        }
+//    }
     
     public override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
         self.view.bringSubview(toFront: label)
         buffers.append("viewWillTransition")
         tableView.reloadData()
-        
     }
     
     public func receive(_ message: PlaygroundValue) {
-        switch message {
-        case .dictionary(let dict):
-            updateAttribute(dict)
-        case .data(let data):
-            self.updateImage(data)
-        default:
-            do {}
-        }
+        
+        update(message)
+        
+//        switch message {
+//        case .dictionary(let dict):
+//            updateAttribute(dict)
+//        case .data(let data):
+//            self.updateImage(data)
+//        default:
+//            do {}
+//        }
     }
 }
