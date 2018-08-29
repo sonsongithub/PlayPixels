@@ -36,6 +36,6 @@ TARGETED_DEVICE_FAMILY = 2
 // The supporting frameworks do not contain bitcode, so disable bitcode generation for this project.
 ENABLE_BITCODE = NO
 
-BUNDLE_IDENTIFIER_PREFIX = com.sonson
+BUNDLE_IDENTIFIER_PREFIX = com.sonson.playground
 
 PLAYGROUND_BOOK_FILE_NAME = PlayPixels
