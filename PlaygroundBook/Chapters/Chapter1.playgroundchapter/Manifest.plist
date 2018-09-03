@@ -7,8 +7,11 @@
 	<key>Pages</key>
 	<array>
 		<string>Basic.playgroundpage</string>
+		<string>Gray.playgroundpage</string>
 		<string>Binarize.playgroundpage</string>
+		<string>AveFilter.playgroundpage</string>
 		<string>Filter.playgroundpage</string>
+		<string>Accelerate2.playgroundpage</string>
 	</array>
 </dict>
 </plist>

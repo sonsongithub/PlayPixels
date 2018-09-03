@@ -10,6 +10,7 @@ import UIKit
 import PlaygroundSupport
 import AVFoundation
 import CoreImage
+import Accelerate
 
 public enum CameraOrientation {
     case landscapeLeft
@@ -46,6 +47,8 @@ public class LiveViewController: UIViewController, PlaygroundLiveViewMessageHand
     
     var pixelBuffer24bit: [CUnsignedChar]?
     var pixelBuffer32bit: [CUnsignedChar]?
+    var grayBuffer: [CUnsignedChar]?
+    var floatBuffer: [Float]?
     
     var outputWidth = 192
     var outputHeight = 144
@@ -120,6 +123,8 @@ public class LiveViewController: UIViewController, PlaygroundLiveViewMessageHand
 //            vc?.send(.dictionary(dict))
             #endif
             pixelBuffer24bit = [CUnsignedChar](repeating: 0, count: height * width * 3)
+            grayBuffer = [CUnsignedChar](repeating: 0, count: height * width)
+            floatBuffer = [Float](repeating: 0, count: height * width)
         }
         if pixelBuffer32bit == nil {
             pixelBuffer32bit = [CUnsignedChar](repeating: 0, count: height * width * 4)
@@ -154,11 +159,24 @@ public class LiveViewController: UIViewController, PlaygroundLiveViewMessageHand
         
         updateOrientation(width: width, height: height)
         
-        let data = NSData(bytes: pixelBuffer24bit, length: MemoryLayout<CUnsignedChar>.size * outputWidth * outputHeight * 3)
-        let value = PlaygroundValue.dictionary(["data": .data(data as Data), "width": .integer(outputWidth), "height": .integer(outputHeight), "bytesPerPixel": .integer(3)])
+        for y in 0..<height {
+            for x in 0..<width {
+                let red = pixelBuffer24bit![3 * x + y * outputWidth * 3 + 0]
+                let green = pixelBuffer24bit![3 * x + y * outputWidth * 3 + 1]
+                let blue = pixelBuffer24bit![3 * x + y * outputWidth * 3 + 2]
+                
+                let simpleGray = (UInt(red) + UInt(green) + UInt(blue)) / 3
+                
+                grayBuffer![x + y * width] = simpleGray > 255 ? 255 : CUnsignedChar(simpleGray)
+            }
+        }
 #if LiveViewTestApp
+        let data = NSData(bytes: grayBuffer, length: MemoryLayout<CUnsignedChar>.size * outputWidth * outputHeight * 1)
+        let value = PlaygroundValue.dictionary(["data": .data(data as Data), "width": .integer(outputWidth), "height": .integer(outputHeight), "bytesPerPixel": .integer(1)])
         self.update(value)
 #else
+        let data = NSData(bytes: pixelBuffer24bit, length: MemoryLayout<CUnsignedChar>.size * outputWidth * outputHeight * 3)
+        let value = PlaygroundValue.dictionary(["data": .data(data as Data), "width": .integer(outputWidth), "height": .integer(outputHeight), "bytesPerPixel": .integer(3)])
         self.send(value)
 #endif
         CVPixelBufferUnlockBaseAddress(pixelBuffer, .readOnly)
