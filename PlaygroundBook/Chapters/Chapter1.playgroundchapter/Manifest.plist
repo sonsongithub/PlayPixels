@@ -6,12 +6,15 @@
 	<string>ChapterOneName</string>
 	<key>Pages</key>
 	<array>
-		<string>Basic.playgroundpage</string>
-		<string>Gray.playgroundpage</string>
-		<string>Binarize.playgroundpage</string>
-		<string>AveFilter.playgroundpage</string>
-		<string>Filter.playgroundpage</string>
-		<string>Accelerate2.playgroundpage</string>
+		<string>01-Basic.playgroundpage</string>
+		<string>02-Gray.playgroundpage</string>
+		<string>03-Binarize.playgroundpage</string>
+		<string>04-AveFilter.playgroundpage</string>
+		<string>05-Filter.playgroundpage</string>
+		<string>06-Accelerate.playgroundpage</string>
+		<string>07-Accelerate2.playgroundpage</string>
+		<string>08-Edge.playgroundpage</string>
+		<string>09-Vision.playgroundpage</string>
 	</array>
 </dict>
 </plist>
