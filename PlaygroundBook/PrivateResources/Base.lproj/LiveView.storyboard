@@ -18,30 +18,32 @@
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" misplaced="YES" text="Live View" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="h6a-7e-CMz">
-                                <rect key="frame" x="151" y="231" width="73" height="205"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                <nil key="textColor"/>
-                                <nil key="highlightedColor"/>
-                            </label>
                             <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="vet-fn-amd">
                                 <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                             </tableView>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="MGl-Gl-qGF">
+                                <rect key="frame" x="310" y="30" width="50" height="30"/>
+                                <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
+                                <state key="normal" title="Toggle"/>
+                                <connections>
+                                    <action selector="pushToggleWithSender:" destination="fcD-sv-Xiz" eventType="touchUpInside" id="DHu-is-P8E"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
                             <constraint firstItem="vet-fn-amd" firstAttribute="top" secondItem="Rh2-0a-zph" secondAttribute="top" id="5Pa-4K-akE"/>
                             <constraint firstItem="vet-fn-amd" firstAttribute="trailing" secondItem="qaR-nP-dw0" secondAttribute="trailing" id="CCe-qQ-RKi"/>
-                            <constraint firstItem="h6a-7e-CMz" firstAttribute="centerX" secondItem="Rh2-0a-zph" secondAttribute="centerX" id="DgE-dK-YaV"/>
                             <constraint firstItem="vet-fn-amd" firstAttribute="leading" secondItem="qaR-nP-dw0" secondAttribute="leading" id="LSv-WS-Mdu"/>
                             <constraint firstItem="vet-fn-amd" firstAttribute="bottom" secondItem="qaR-nP-dw0" secondAttribute="bottom" id="VxM-hX-obA"/>
-                            <constraint firstItem="h6a-7e-CMz" firstAttribute="centerY" secondItem="Rh2-0a-zph" secondAttribute="centerY" id="rsb-9d-7m1"/>
+                            <constraint firstItem="MGl-Gl-qGF" firstAttribute="top" secondItem="qaR-nP-dw0" secondAttribute="top" constant="10" id="lXt-i7-SPx"/>
+                            <constraint firstItem="qaR-nP-dw0" firstAttribute="trailing" secondItem="MGl-Gl-qGF" secondAttribute="trailing" constant="15" id="qlF-YX-dtK"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="qaR-nP-dw0"/>
                     </view>
                     <connections>
-                        <outlet property="label" destination="h6a-7e-CMz" id="uG3-jD-Qex"/>
+                        <outlet property="button" destination="MGl-Gl-qGF" id="u57-n1-1gH"/>
                         <outlet property="tableView" destination="vet-fn-amd" id="51o-Ye-etM"/>
                     </connections>
                 </viewController>

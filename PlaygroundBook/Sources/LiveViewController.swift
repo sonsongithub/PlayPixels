@@ -20,25 +20,6 @@ public enum CameraOrientation {
     case unknown
 }
 
-public func unpack(_ value: PlaygroundValue) -> (Data, Int, Int, Int)? {
-    
-    if case .dictionary(let dict) = value {
-        guard let d_value = dict["data"] else { return nil }
-        guard let w_value = dict["width"] else { return nil }
-        guard let h_value = dict["height"] else { return nil }
-        guard let p_value = dict["bytesPerPixel"] else { return nil }
-        
-        if case (.data(let data), .integer(let width), .integer(let height), .integer(let bytesPerPixel)) = (d_value, w_value, h_value, p_value) {
-            print(data)
-            print(width)
-            print(height)
-            return (data, width, height, bytesPerPixel)
-        }
-    }
-    
-    return nil
-}
-
 @objc(Book_Sources_LiveViewController)
 public class LiveViewController: UIViewController, PlaygroundLiveViewMessageHandler, PlaygroundLiveViewSafeAreaContainer, UITableViewDelegate, UITableViewDataSource, AVCaptureVideoDataOutputSampleBufferDelegate {
     
@@ -55,6 +36,8 @@ public class LiveViewController: UIViewController, PlaygroundLiveViewMessageHand
     
     var data: Data?
     
+    private var cameraPosition = AVCaptureDevice.Position.front
+    
     public var orientation = CameraOrientation.landscapeLeft
     
     #if LiveViewTestApp
@@ -66,29 +49,21 @@ public class LiveViewController: UIViewController, PlaygroundLiveViewMessageHand
     public static var aaaa: CUnsignedChar = 10
     public var threshold: CUnsignedChar = 255
     
-    @IBOutlet var label: UILabel!
+    @IBOutlet var button: UIButton!
     
     @IBOutlet var tableView: UITableView!
     
     var buffers: [String] = []
     
-    public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return buffers.count
-    }
-    
-    public func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return 44
-    }
-    
-    public func numberOfSections(in tableView: UITableView) -> Int {
-        return 1
-    }
-    
-    public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath)
-        cell.backgroundColor = .clear
-        cell.textLabel?.text = buffers[indexPath.row]
-        return cell
+    @IBAction func pushToggle(sender: Any) {
+        if cameraPosition == .front {
+            cameraPosition = .back
+            setup(position: .back)
+        } else {
+            cameraPosition = .front
+            setup(position: .front)
+        }
+        updateLog(string: "toggle")
     }
     
     fileprivate var cameraOrientation = CameraOrientation.unknown
@@ -130,24 +105,32 @@ public class LiveViewController: UIViewController, PlaygroundLiveViewMessageHand
             pixelBuffer32bit = [CUnsignedChar](repeating: 0, count: height * width * 4)
         }
         
-        let convertPosition: (Int, Int, CameraOrientation) -> (Int, Int) = { (x: Int, y: Int, cameraOrientation: CameraOrientation) -> (Int, Int) in
-            switch cameraOrientation {
-            case .landscapeLeft:
+        let convertPosition: (Int, Int, CameraOrientation, AVCaptureDevice.Position) -> (Int, Int) = { (x: Int, y: Int, cameraOrientation: CameraOrientation, position: AVCaptureDevice.Position) -> (Int, Int) in
+            switch (cameraOrientation, position) {
+            case (.landscapeLeft, .front):
                 return (x, y)
-            case .landscapeRight:
+            case (.landscapeRight, .front):
                 return (x, height - 1 - y)
-            case .portrait:
+            case (.portrait, .front):
                 return (y, x)
-            case .portraitUpsideDown:
+            case (.portraitUpsideDown, .front):
+                return (y, width - 1 - x)
+            case (.landscapeLeft, .back):
+                return (x, height - 1 - y)
+            case (.landscapeRight, .back):
+                return (x, y)
+            case (.portrait, .back):
+                return (y, x)
+            case (.portraitUpsideDown, .back):
                 return (y, width - 1 - x)
             default:
-                return (0, 0)
+                return (x, y)
             }
         }
         
         for y in 0..<height {
             for x in 0..<width {
-                let (targetx, targety) = convertPosition(x, y, cameraOrientation)
+                let (targetx, targety) = convertPosition(x, y, cameraOrientation, cameraPosition)
                 let b = pointer[4 * x + y * bytesPerRow + 0]
                 let g = pointer[4 * x + y * bytesPerRow + 1]
                 let r = pointer[4 * x + y * bytesPerRow + 2]
@@ -170,10 +153,13 @@ public class LiveViewController: UIViewController, PlaygroundLiveViewMessageHand
                 grayBuffer![x + y * width] = simpleGray > 255 ? 255 : CUnsignedChar(simpleGray)
             }
         }
+
 #if LiveViewTestApp
         let data = NSData(bytes: grayBuffer, length: MemoryLayout<CUnsignedChar>.size * outputWidth * outputHeight * 1)
-        let value = PlaygroundValue.dictionary(["data": .data(data as Data), "width": .integer(outputWidth), "height": .integer(outputHeight), "bytesPerPixel": .integer(1)])
-        self.update(value)
+        let (message) = PlaygroundValue.dictionary(["data": .data(data as Data), "width": .integer(outputWidth), "height": .integer(outputHeight), "bytesPerPixel": .integer(1)])
+        if let (data, width, height, bytesPerPixel) = unpackPixels(message) {
+            updateImage(data: data, width: width, height: height, bytesPerPixel: bytesPerPixel)
+        }
 #else
         let data = NSData(bytes: pixelBuffer24bit, length: MemoryLayout<CUnsignedChar>.size * outputWidth * outputHeight * 3)
         let value = PlaygroundValue.dictionary(["data": .data(data as Data), "width": .integer(outputWidth), "height": .integer(outputHeight), "bytesPerPixel": .integer(3)])
@@ -182,10 +168,16 @@ public class LiveViewController: UIViewController, PlaygroundLiveViewMessageHand
         CVPixelBufferUnlockBaseAddress(pixelBuffer, .readOnly)
     }
     
-    public func setup() {
+    public func setup(position: AVCaptureDevice.Position) {
+        
+        if self.session != nil {
+            self.session.stopRunning()
+            self.session = nil
+            self.device = nil
+        }
         
         let session = AVCaptureSession()
-        let discoverySession = AVCaptureDevice.DiscoverySession(deviceTypes: [.builtInWideAngleCamera], mediaType: .video, position: .front)
+        let discoverySession = AVCaptureDevice.DiscoverySession(deviceTypes: [.builtInWideAngleCamera], mediaType: .video, position: position)
         guard discoverySession.devices.count > 0 else {
             assert(false, "Cannot initialize capture device.")
             return
@@ -225,6 +217,7 @@ public class LiveViewController: UIViewController, PlaygroundLiveViewMessageHand
         
         self.session = session
         self.device = device
+        self.session.startRunning()
     }
     
     public override func viewDidLoad() {
@@ -255,14 +248,14 @@ public class LiveViewController: UIViewController, PlaygroundLiveViewMessageHand
         self.constraintHeight = constraintHeight
         
         self.view.bringSubview(toFront: tableView)
+        self.view.bringSubview(toFront: button)
         
-        setup()
     }
     
     public override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        
-        self.session.startRunning()
+        cameraPosition = .front
+        setup(position: .front)
     }
     
     private func updateOrientation(width: Int, height: Int) {
@@ -310,96 +303,73 @@ public class LiveViewController: UIViewController, PlaygroundLiveViewMessageHand
         }
     }
     
+    public override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+        buffers.append("viewWillTransition")
+        tableView.reloadData()
+    }
+    
+    // MARK: - Message dispatch
+    
+    public func updateImage(data: Data, width: Int, height: Int, bytesPerPixel: Int) {
+        if let image = createImage(data: data, buffer: &pixelBuffer32bit!, width: width, height: height, bytesPerPixel: bytesPerPixel) {
+            DispatchQueue.main.async {
+                self.imageView.image = image
+            }
+        }
+    }
+    
+    public func updateLog(string: String) {
+        tableView.beginUpdates()
+        buffers.append(string)
+        tableView.insertRows(at: [IndexPath(row: self.buffers.count - 1, section: 0)], with: .left)
+        tableView.endUpdates()
+        tableView.scrollToRow(at: IndexPath(row: self.buffers.count - 1, section: 0), at: .bottom, animated: true)
+    }
+    
+    // MARK: - Log
+    
+    public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return buffers.count
+    }
+    
+    public func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        return 44
+    }
+    
+    public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        
+    }
+    
+    public func numberOfSections(in tableView: UITableView) -> Int {
+        return 1
+    }
+    
+    public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath)
+        cell.backgroundColor = .clear
+        cell.textLabel?.text = buffers[indexPath.row]
+        cell.selectionStyle = .none
+        return cell
+    }
+    
+    // MARK: - PlaygroundSupport
+    
     public func liveViewMessageConnectionOpened() {
         // Implement this method to be notified when the live view message connection is opened.
         // The connection will be opened when the process running Contents.swift starts running and listening for messages.
     }
-
+    
     public func liveViewMessageConnectionClosed() {
         // Implement this method to be notified when the live view message connection is closed.
         // The connection will be closed when the process running Contents.swift exits and is no longer listening for messages.
         // This happens when the user's code naturally finishes running, if the user presses Stop, or if there is a crash.
     }
     
-    private func creatCGImage(pointer: UnsafeMutableRawPointer?, width: Int, height: Int, bytesPerPixel: Int) -> CGImage? {
-        let colorSpace = CGColorSpaceCreateDeviceRGB()
-        let bitmapInfo = CGBitmapInfo(rawValue: CGImageAlphaInfo.premultipliedLast.rawValue)
-            .union(CGBitmapInfo.byteOrder32Little)
-        guard let context = CGContext(data: pointer, width: (width), height: (height), bitsPerComponent: 8, bytesPerRow: (bytesPerPixel), space: colorSpace, bitmapInfo: bitmapInfo.rawValue) else { return nil }
-        return context.makeImage()
-    }
-        
-    public func update(_ value: PlaygroundValue) {
-        guard let (data, _, _, bytesPerPixel) = unpack(value) else {
-            return
-        }
-        
-        if bytesPerPixel == 3 {
-            
-            guard outputHeight > 0 && outputWidth > 0 else {
-                return
-            }
-            
-            data.withUnsafeBytes { (u8Ptr: UnsafePointer<CUnsignedChar>) in
-                let rawPtr = UnsafePointer(u8Ptr)
-                for y in 0..<outputHeight {
-                    for x in 0..<outputWidth {
-                        let r = rawPtr[3 * x + y * outputWidth * 3 + 0]
-                        let g = rawPtr[3 * x + y * outputWidth * 3 + 1]
-                        let b = rawPtr[3 * x + y * outputWidth * 3 + 2]
-                        pixelBuffer32bit![4 * x + y * outputWidth * 4 + 0] = 255
-                        pixelBuffer32bit![4 * x + y * outputWidth * 4 + 1] = b
-                        pixelBuffer32bit![4 * x + y * outputWidth * 4 + 2] = g
-                        pixelBuffer32bit![4 * x + y * outputWidth * 4 + 3] = r
-                    }
-                }
-                
-                guard let cgImage = creatCGImage(pointer: &pixelBuffer32bit!, width: outputWidth, height: outputHeight, bytesPerPixel: outputWidth * 4) else {
-                    return
-                }
-                
-                let uiImage = UIImage(cgImage: cgImage)
-                
-                DispatchQueue.main.async {
-                    self.imageView.image = uiImage
-                }
-            }
-        } else if bytesPerPixel == 1 {
-            
-            guard outputHeight > 0 && outputWidth > 0 else {
-                return
-            }
-            
-            data.withUnsafeBytes { (u8Ptr: UnsafePointer<CUnsignedChar>) in
-                let rawPtr = UnsafePointer(u8Ptr)
-                for y in 0..<outputHeight {
-                    for x in 0..<outputWidth {
-                        let gray = rawPtr[x + y * outputWidth]
-                        pixelBuffer32bit![4 * x + y * outputWidth * 4 + 0] = 255
-                        pixelBuffer32bit![4 * x + y * outputWidth * 4 + 1] = gray
-                        pixelBuffer32bit![4 * x + y * outputWidth * 4 + 2] = gray
-                        pixelBuffer32bit![4 * x + y * outputWidth * 4 + 3] = gray
-                    }
-                }
-                
-                guard let cgImage = creatCGImage(pointer: &pixelBuffer32bit!, width: outputWidth, height: outputHeight, bytesPerPixel: outputWidth * 4) else { return }
-                
-                let uiImage = UIImage(cgImage: cgImage)
-                
-                DispatchQueue.main.async {
-                    self.imageView.image = uiImage
-                }
-            }
-        }
-    }
-    
-    public override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
-        self.view.bringSubview(toFront: label)
-        buffers.append("viewWillTransition")
-        tableView.reloadData()
-    }
-    
     public func receive(_ message: PlaygroundValue) {
-        update(message)
+        if let (data, width, height, bytesPerPixel) = unpackPixels(message) {
+            updateImage(data: data, width: width, height: height, bytesPerPixel: bytesPerPixel)
+        } else if let string = unpackLog(message) {
+            updateLog(string: string)
+        }
     }
 }
