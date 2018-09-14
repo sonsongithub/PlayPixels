@@ -49,22 +49,12 @@ public class LiveViewController: UIViewController, PlaygroundLiveViewMessageHand
     public static var aaaa: CUnsignedChar = 10
     public var threshold: CUnsignedChar = 255
     
-    @IBOutlet var button: UIButton!
-    
     @IBOutlet var tableView: UITableView!
+    @IBOutlet var cameraToggle: UIButton!
+    @IBOutlet var logSwitch: UIButton!
+    @IBOutlet var trashButton: UIButton!
     
     var buffers: [String] = []
-    
-    @IBAction func pushToggle(sender: Any) {
-        if cameraPosition == .front {
-            cameraPosition = .back
-            setup(position: .back)
-        } else {
-            cameraPosition = .front
-            setup(position: .front)
-        }
-        updateLog(string: "toggle")
-    }
     
     fileprivate var cameraOrientation = CameraOrientation.unknown
     
@@ -248,8 +238,18 @@ public class LiveViewController: UIViewController, PlaygroundLiveViewMessageHand
         self.constraintHeight = constraintHeight
         
         self.view.bringSubview(toFront: tableView)
-        self.view.bringSubview(toFront: button)
+        self.view.bringSubview(toFront: cameraToggle)
+        self.view.bringSubview(toFront: trashButton)
+        self.view.bringSubview(toFront: logSwitch)
         
+        [(trashButton, "trash"), (cameraToggle, "camera"), (logSwitch, "no_monitor")].forEach({
+            if let image = UIImage(named: $0.1) {
+                let temp = image.withRenderingMode(.alwaysTemplate)
+                $0.0.setImage(temp, for: .normal)
+            }
+        })
+        trashButton.isHidden = true
+        tableView.isHidden = true
     }
     
     public override func viewDidAppear(_ animated: Bool) {
@@ -308,6 +308,41 @@ public class LiveViewController: UIViewController, PlaygroundLiveViewMessageHand
         tableView.reloadData()
     }
     
+    // MARK: - IBAction
+    
+    @IBAction func pushToggle(sender: Any) {
+        if cameraPosition == .front {
+            cameraPosition = .back
+            setup(position: .back)
+        } else {
+            cameraPosition = .front
+            setup(position: .front)
+        }
+        updateLog(string: "toggle")
+    }
+    
+    @IBAction func didChangedSwitch(sender: Any) {
+        tableView.isHidden = !tableView.isHidden
+        trashButton.isHidden = tableView.isHidden
+        
+        if tableView.isHidden {
+            if let image = UIImage(named: "no_monitor") {
+                let temp = image.withRenderingMode(.alwaysTemplate)
+                logSwitch.setImage(temp, for: .normal)
+            }
+        } else {
+            if let image = UIImage(named: "monitor") {
+                let temp = image.withRenderingMode(.alwaysTemplate)
+                logSwitch.setImage(temp, for: .normal)
+            }
+        }
+    }
+    
+    @IBAction func didPushTrashButton(sender: Any) {
+        buffers.removeAll()
+        tableView.reloadData()
+    }
+    
     // MARK: - Message dispatch
     
     public func updateImage(data: Data, width: Int, height: Int, bytesPerPixel: Int) {
@@ -329,6 +364,7 @@ public class LiveViewController: UIViewController, PlaygroundLiveViewMessageHand
     // MARK: - Log
     
     public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        trashButton.isEnabled = (buffers.count > 0)
         return buffers.count
     }
     

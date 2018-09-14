@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="14113" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="fcD-sv-Xiz">
-    <device id="retina4_7" orientation="portrait">
+    <device id="ipad10_5" orientation="landscape">
         <adaptation id="fullscreen"/>
     </device>
     <dependencies>
@@ -15,36 +15,63 @@
             <objects>
                 <viewController id="fcD-sv-Xiz" customClass="Book_Sources_LiveViewController" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="Rh2-0a-zph">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <rect key="frame" x="0.0" y="0.0" width="1112" height="834"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="vet-fn-amd">
-                                <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                                <rect key="frame" x="0.0" y="0.0" width="1112" height="834"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                             </tableView>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="MGl-Gl-qGF">
-                                <rect key="frame" x="310" y="30" width="50" height="30"/>
-                                <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
-                                <state key="normal" title="Toggle"/>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="MGl-Gl-qGF">
+                                <rect key="frame" x="1048" y="52" width="32" height="32"/>
+                                <state key="normal" image="camera.png"/>
                                 <connections>
                                     <action selector="pushToggleWithSender:" destination="fcD-sv-Xiz" eventType="touchUpInside" id="DHu-is-P8E"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Vbj-4A-bSa">
+                                <rect key="frame" x="984" y="52" width="32" height="32"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="32" id="D4w-eb-QZL"/>
+                                    <constraint firstAttribute="height" constant="32" id="Krz-lg-z4g"/>
+                                </constraints>
+                                <state key="normal" image="hoge"/>
+                                <connections>
+                                    <action selector="didChangedSwitchWithSender:" destination="fcD-sv-Xiz" eventType="touchUpInside" id="b6Y-N5-VGH"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="SXs-Li-Ap5">
+                                <rect key="frame" x="920" y="52" width="32" height="32"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="32" id="5x3-AU-jXW"/>
+                                    <constraint firstAttribute="height" constant="32" id="kW3-he-CaI"/>
+                                </constraints>
+                                <state key="normal" title="Button" image="trash.png"/>
+                                <connections>
+                                    <action selector="didPushTrashButtonWithSender:" destination="fcD-sv-Xiz" eventType="touchUpInside" id="URQ-ZL-M1E"/>
                                 </connections>
                             </button>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
                             <constraint firstItem="vet-fn-amd" firstAttribute="top" secondItem="Rh2-0a-zph" secondAttribute="top" id="5Pa-4K-akE"/>
+                            <constraint firstItem="SXs-Li-Ap5" firstAttribute="centerY" secondItem="MGl-Gl-qGF" secondAttribute="centerY" id="99d-Uz-iiw"/>
                             <constraint firstItem="vet-fn-amd" firstAttribute="trailing" secondItem="qaR-nP-dw0" secondAttribute="trailing" id="CCe-qQ-RKi"/>
                             <constraint firstItem="vet-fn-amd" firstAttribute="leading" secondItem="qaR-nP-dw0" secondAttribute="leading" id="LSv-WS-Mdu"/>
+                            <constraint firstItem="Vbj-4A-bSa" firstAttribute="leading" secondItem="SXs-Li-Ap5" secondAttribute="trailing" constant="32" id="OaD-bg-7BD"/>
+                            <constraint firstItem="Vbj-4A-bSa" firstAttribute="centerY" secondItem="MGl-Gl-qGF" secondAttribute="centerY" id="RUX-pq-RG2"/>
                             <constraint firstItem="vet-fn-amd" firstAttribute="bottom" secondItem="qaR-nP-dw0" secondAttribute="bottom" id="VxM-hX-obA"/>
-                            <constraint firstItem="MGl-Gl-qGF" firstAttribute="top" secondItem="qaR-nP-dw0" secondAttribute="top" constant="10" id="lXt-i7-SPx"/>
-                            <constraint firstItem="qaR-nP-dw0" firstAttribute="trailing" secondItem="MGl-Gl-qGF" secondAttribute="trailing" constant="15" id="qlF-YX-dtK"/>
+                            <constraint firstItem="MGl-Gl-qGF" firstAttribute="leading" secondItem="Vbj-4A-bSa" secondAttribute="trailing" constant="32" id="W3j-26-Ws8"/>
+                            <constraint firstItem="MGl-Gl-qGF" firstAttribute="top" secondItem="qaR-nP-dw0" secondAttribute="top" constant="32" id="lXt-i7-SPx"/>
+                            <constraint firstItem="qaR-nP-dw0" firstAttribute="trailing" secondItem="MGl-Gl-qGF" secondAttribute="trailing" constant="32" id="qlF-YX-dtK"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="qaR-nP-dw0"/>
                     </view>
                     <connections>
-                        <outlet property="button" destination="MGl-Gl-qGF" id="u57-n1-1gH"/>
+                        <outlet property="cameraToggle" destination="MGl-Gl-qGF" id="oPV-7r-5XC"/>
+                        <outlet property="logSwitch" destination="Vbj-4A-bSa" id="0GV-Ub-AfA"/>
                         <outlet property="tableView" destination="vet-fn-amd" id="51o-Ye-etM"/>
+                        <outlet property="trashButton" destination="SXs-Li-Ap5" id="jtW-5I-HUB"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="uvi-wC-fap" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -52,4 +79,9 @@
             <point key="canvasLocation" x="-247.19999999999999" y="95.802098950524751"/>
         </scene>
     </scenes>
+    <resources>
+        <image name="camera.png" width="32" height="32"/>
+        <image name="hoge" width="16" height="16"/>
+        <image name="trash.png" width="32" height="32"/>
+    </resources>
 </document>
