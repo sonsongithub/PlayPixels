@@ -12,29 +12,25 @@
 		<data>
 		mUQufV90MvxQRrsoZqK+1euqMe8=
 		</data>
-		<key>Headers/LiveViewHost-Swift.h</key>
-		<data>
-		RIXPY/vfnjbO4nkQnDpm5Re548s=
-		</data>
 		<key>Headers/LiveViewHost.h</key>
 		<data>
 		reIdyOuLg8dnksaMgZwZT3LWWHc=
 		</data>
 		<key>Info.plist</key>
 		<data>
-		CMBrPI6zx9hl28mBPFqThQq2XoU=
+		GU35InqZGkOjUFo2SXaKCkN/dEY=
 		</data>
 		<key>Modules/LiveViewHost.swiftmodule/x86_64.swiftdoc</key>
 		<data>
-		GVrzFRS+18hNq1YiyBSB1oXwYQI=
+		RcKDrdNDhdMlDTyexMENQVPM1Gs=
 		</data>
 		<key>Modules/LiveViewHost.swiftmodule/x86_64.swiftmodule</key>
 		<data>
-		u/F61zhdUq96CB7pHa4OA+DeWu0=
+		WgQw76iVTx7Bgg8Y9A+ex7kAH6s=
 		</data>
 		<key>Modules/module.modulemap</key>
 		<data>
-		e06YZM3QyNBgF8hNaT0LdzJI+AQ=
+		wbBJ01HD+QOtrC3j8UYGj4MLjkc=
 		</data>
 	</dict>
 	<key>files2</key>
@@ -61,17 +57,6 @@
 			ehXAHnNyJrLTAVieZWH02su+pjNFKO2MzXFa7G7RG6U=
 			</data>
 		</dict>
-		<key>Headers/LiveViewHost-Swift.h</key>
-		<dict>
-			<key>hash</key>
-			<data>
-			RIXPY/vfnjbO4nkQnDpm5Re548s=
-			</data>
-			<key>hash2</key>
-			<data>
-			RTgJ3vEltwbgZTh5WjfjPOAGoP/jc2Sf3ax80sAkohY=
-			</data>
-		</dict>
 		<key>Headers/LiveViewHost.h</key>
 		<dict>
 			<key>hash</key>
@@ -87,33 +72,33 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			GVrzFRS+18hNq1YiyBSB1oXwYQI=
+			RcKDrdNDhdMlDTyexMENQVPM1Gs=
 			</data>
 			<key>hash2</key>
 			<data>
-			yfboLmu0g5KOcr4k+lEDE5dmB1XaW+GuRdx01Itcm5M=
+			Mp5wJItTq1Xsi/+QBsT8H5ouDRMEwzE2sy3Vd0SS3fs=
 			</data>
 		</dict>
 		<key>Modules/LiveViewHost.swiftmodule/x86_64.swiftmodule</key>
 		<dict>
 			<key>hash</key>
 			<data>
-			u/F61zhdUq96CB7pHa4OA+DeWu0=
+			WgQw76iVTx7Bgg8Y9A+ex7kAH6s=
 			</data>
 			<key>hash2</key>
 			<data>
-			11iaCNAdzUUNad41Vcdc14X6A7nUlfRHj4rfUyR36ng=
+			Ii/Z6aYTcW/BV9gp5j5Cp9ot5kr+iUV68mrSWEqRY4U=
 			</data>
 		</dict>
 		<key>Modules/module.modulemap</key>
 		<dict>
 			<key>hash</key>
 			<data>
-			e06YZM3QyNBgF8hNaT0LdzJI+AQ=
+			wbBJ01HD+QOtrC3j8UYGj4MLjkc=
 			</data>
 			<key>hash2</key>
 			<data>
-			MaUm9sAPxbgOrle71kXHybnbh/loFCgELug7l44TriA=
+			oCZJDkJCW/8imzJCKOZeEEtXZrQHkn5YWvOfK4yoYBc=
 			</data>
 		</dict>
 	</dict>
