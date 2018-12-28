@@ -4,8 +4,3 @@ framework module LiveViewHost {
   export *
   module * { export * }
 }
-
-module LiveViewHost.Swift {
-    header "LiveViewHost-Swift.h"
-    requires objc
-}

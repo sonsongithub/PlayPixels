@@ -6,11 +6,7 @@
 	<dict>
 		<key>Assets.car</key>
 		<data>
-		ECaXGhrY5mOw8z8+jBs4kdvlQUA=
-		</data>
-		<key>Headers/PlaygroundBluetooth-Swift.h</key>
-		<data>
-		O+DYayzd8kUOFgbeLhOOgN6LlGA=
+		LQWUyA4iK+avBlm7+dxaBSdt9DY=
 		</data>
 		<key>Headers/PlaygroundBluetooth.h</key>
 		<data>
@@ -18,19 +14,19 @@
 		</data>
 		<key>Info.plist</key>
 		<data>
-		jx8EqkhHZEseJWQ+5RujyVxgvNM=
+		2wPuMP/Y6ocnMrltGgP6QnQls3M=
 		</data>
 		<key>Modules/PlaygroundBluetooth.swiftmodule/x86_64.swiftdoc</key>
 		<data>
-		4cCoVwxXGiEk3WzmiF06Z1+LHoY=
+		GD836alLpushFV43/PFu3Ew/6NI=
 		</data>
 		<key>Modules/PlaygroundBluetooth.swiftmodule/x86_64.swiftmodule</key>
 		<data>
-		VDkKrrFypyOA/XmHbDAKOIcGvsI=
+		Ai6sIkc42hwN3xEx+nq1niNnbB8=
 		</data>
 		<key>Modules/module.modulemap</key>
 		<data>
-		SaipAZqjIQ7X79y+dYrPk9s3/qI=
+		GdvBNEmovuLN9v8ssg4TCp8HEt0=
 		</data>
 		<key>en.lproj/Localizable.strings</key>
 		<dict>
@@ -48,22 +44,11 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			ECaXGhrY5mOw8z8+jBs4kdvlQUA=
+			LQWUyA4iK+avBlm7+dxaBSdt9DY=
 			</data>
 			<key>hash2</key>
 			<data>
-			yY9sU9HNKUe5ebGX81zM/fbj7cWqraBUDGHjJ5iqOlk=
-			</data>
-		</dict>
-		<key>Headers/PlaygroundBluetooth-Swift.h</key>
-		<dict>
-			<key>hash</key>
-			<data>
-			O+DYayzd8kUOFgbeLhOOgN6LlGA=
-			</data>
-			<key>hash2</key>
-			<data>
-			BqGYz6y8Y5w+7Z5ixeIS9pwekrayCBIdwUphtu+6Sb8=
+			hjIEteQmjsNxNWEZJRiZajS1ydqvWaOEs6cM4+c2J1Y=
 			</data>
 		</dict>
 		<key>Headers/PlaygroundBluetooth.h</key>
@@ -81,33 +66,33 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			4cCoVwxXGiEk3WzmiF06Z1+LHoY=
+			GD836alLpushFV43/PFu3Ew/6NI=
 			</data>
 			<key>hash2</key>
 			<data>
-			c0ShzCIwvgc99R6mL4q1DI33Jzf0KwBVdOyYWKVxK9s=
+			/B4DuVNgH9WYhZN8l2ZQQgd5HVU/fKyT7Vv91d695hg=
 			</data>
 		</dict>
 		<key>Modules/PlaygroundBluetooth.swiftmodule/x86_64.swiftmodule</key>
 		<dict>
 			<key>hash</key>
 			<data>
-			VDkKrrFypyOA/XmHbDAKOIcGvsI=
+			Ai6sIkc42hwN3xEx+nq1niNnbB8=
 			</data>
 			<key>hash2</key>
 			<data>
-			zAUXH8bnAv7goRa2WNipBVXBcYu5CMsUD+YeenCBFYg=
+			lXgSZJyglJ2r4W3/xccmktYasfHQFLFwYdTk09l5KRQ=
 			</data>
 		</dict>
 		<key>Modules/module.modulemap</key>
 		<dict>
 			<key>hash</key>
 			<data>
-			SaipAZqjIQ7X79y+dYrPk9s3/qI=
+			GdvBNEmovuLN9v8ssg4TCp8HEt0=
 			</data>
 			<key>hash2</key>
 			<data>
-			hzKPoiF7u6sEhrhY/AUJ4KSIah+drOkUikok7urJKio=
+			KDH6BlM0dvMkACFfCQRFXvI+E0o9C3s3ONGwS5qgFpU=
 			</data>
 		</dict>
 		<key>en.lproj/Localizable.strings</key>
