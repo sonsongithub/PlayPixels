@@ -197,7 +197,7 @@ public class LiveViewController: UIViewController, PlaygroundLiveViewMessageHand
         
         do {
             try device.lockForConfiguration()
-            device.activeVideoMinFrameDuration = CMTimeMake(1, 30)
+            device.activeVideoMinFrameDuration = CMTimeMake(value: 1, timescale: 30)
             device.unlockForConfiguration()
         } catch {
             print(error)
@@ -237,15 +237,15 @@ public class LiveViewController: UIViewController, PlaygroundLiveViewMessageHand
         self.constraintWidth = constraintWidth
         self.constraintHeight = constraintHeight
         
-        self.view.bringSubview(toFront: tableView)
-        self.view.bringSubview(toFront: cameraToggle)
-        self.view.bringSubview(toFront: trashButton)
-        self.view.bringSubview(toFront: logSwitch)
+        self.view.bringSubviewToFront(tableView)
+        self.view.bringSubviewToFront(cameraToggle)
+        self.view.bringSubviewToFront(trashButton)
+        self.view.bringSubviewToFront(logSwitch)
         
         [(trashButton, "trash"), (cameraToggle, "camera"), (logSwitch, "no_monitor")].forEach({
             if let image = UIImage(named: $0.1) {
                 let temp = image.withRenderingMode(.alwaysTemplate)
-                $0.0.setImage(temp, for: .normal)
+                $0.0?.setImage(temp, for: .normal)
             }
         })
         trashButton.isHidden = true
