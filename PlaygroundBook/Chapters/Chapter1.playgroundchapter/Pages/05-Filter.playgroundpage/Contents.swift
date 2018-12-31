@@ -58,7 +58,7 @@ class Listener: PlaygroundRemoteLiveViewProxyDelegate {
     
     func remoteLiveViewProxy(_ remoteLiveViewProxy: PlaygroundRemoteLiveViewProxy,
                              received message: PlaygroundValue) {
-        if let (data, width, height, bytesPerPixel) = unpack(message) {
+        if let (data, width, height, bytesPerPixel) = unpackPixels(message) {
             print(data)
             if pixelBuffer24bit == nil {
                 pixelBuffer24bit = [CUnsignedChar](repeating: 0, count: height * width)
