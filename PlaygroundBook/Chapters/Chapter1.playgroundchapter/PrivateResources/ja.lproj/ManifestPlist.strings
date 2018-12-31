@@ -19,3 +19,7 @@ Contains English localizations of values in Manifest.plist files in the playgrou
 
 /* The localized name of the first page in the first chapter in the playground book. */
 "BinarizePage" = "二値化";
+
+"DifferentialFilterCPUHorizontal" = "水平方向微分画像";
+
+"DifferentialFilterCPUVertical" = "垂直方向微分画像";

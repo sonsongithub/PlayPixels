@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
 	<key>Name</key>
-	<string>Filter</string>
+	<string>DifferentialFilterCPUHorizontal</string>
 	<key>LiveViewEdgeToEdge</key>
 	<true/>
 	<key>LiveViewMode</key>
